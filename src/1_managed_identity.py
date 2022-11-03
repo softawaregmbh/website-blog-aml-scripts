@@ -2,7 +2,7 @@ import os
 
 import dotenv
 
-dotenv.load_dotenv('./.env')
+dotenv.load_dotenv('../.env')
 
 
 def main():
@@ -19,8 +19,8 @@ def main():
     managed_identity_principal_id = input('\nEnter its principal id: ')
     managed_identity_resource_id = input('\nEnther its resource id:')
 
-    dotenv.set_key('./.env', 'COMPUTE_IDENTITY_CLIENT_ID', managed_identity_client_id)
-    dotenv.set_key('./.env', 'COMPUTE_IDENTITY_RESOURCE_ID', managed_identity_resource_id)
+    dotenv.set_key('../.env', 'COMPUTE_IDENTITY_CLIENT_ID', managed_identity_client_id)
+    dotenv.set_key('../.env', 'COMPUTE_IDENTITY_RESOURCE_ID', managed_identity_resource_id)
 
     print('\n\n3. Execute to retrieve the storage account\'s resource id:')
     print(f'\naz storage account list --query "[?name==\'{os.getenv("AML_STORAGE_ACCOUNT")}\'].id" -o tsv')
