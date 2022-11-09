@@ -11,7 +11,7 @@ from azureml.core.authentication import ServicePrincipalAuthentication
 import dotenv
 from sklearn import datasets
 
-from console import execute_cli_command, start_action, end_action
+from utils import execute_cli_command, start_action, end_action, wait
 
 
 def main():
@@ -152,13 +152,6 @@ def create_app_registration(app_registration_name: str) -> (str, str, str, str):
 
     return app_registration_id, app_registration_service_principal,\
            app_registration_secrets['tenant'], app_registration_secrets['appId'], app_registration_secrets['password']
-
-
-def wait(seconds: int):
-    action_text = f'Wait for {seconds} seconds'
-    start_action(action_text)
-    time.sleep(seconds)
-    end_action(action_text)
 
 
 def grant_permissions(assignee_title: str, assignee: str, scope_title: str, scope: str, role: str):

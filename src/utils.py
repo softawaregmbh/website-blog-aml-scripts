@@ -1,5 +1,6 @@
 import json
 import subprocess
+import time
 from typing import Union
 
 CONSOLE_COLOR_RESET_CODE = '\x1b[0m'
@@ -39,3 +40,10 @@ def end_action(action_text: str, state: str = 'success'):
         raise ValueError(f'State {state} unhandled.')
 
     print(f'\r{status_symbol} {action_text}')
+
+
+def wait(seconds: int):
+    action_text = f'Wait for {seconds} seconds'
+    start_action(action_text)
+    time.sleep(seconds)
+    end_action(action_text)
