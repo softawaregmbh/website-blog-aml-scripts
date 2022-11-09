@@ -14,10 +14,10 @@ def execute_cli_command(command: str) -> Union[str, list, dict]:
     if command.returncode != 0:
         raise RuntimeError(error_output)
 
+    output = output[: -len(CONSOLE_COLOR_RESET_CODE)] if output.endswith(CONSOLE_COLOR_RESET_CODE) else output
     output = output.strip()
 
     if output.startswith('[') or output.startswith('{'):
-        output = output[: -len(CONSOLE_COLOR_RESET_CODE)] if output.endswith(CONSOLE_COLOR_RESET_CODE) else output
         return json.loads(output)
     elif output.startswith('"') and output.endswith('"'):
         return output[1:-1]

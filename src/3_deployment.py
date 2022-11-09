@@ -6,7 +6,7 @@ from azure.identity import DefaultAzureCredential
 from azure.ai.ml.entities import ManagedOnlineEndpoint, ManagedOnlineDeployment
 import dotenv
 
-from console import execute_cli_command, start_action, end_action
+from utils import execute_cli_command, start_action, end_action
 
 dotenv.load_dotenv('../.env')
 
@@ -22,6 +22,7 @@ def main():
         workspace_name=os.getenv('AML_WORKSPACE_NAME'),
     )
 
+    print()
     scoring_uri = create_endpoint(ml_client, endpoint_name)
 
     deploy_model_to_endpoint(ml_client, endpoint_name, deployment_name)
@@ -46,7 +47,7 @@ def create_endpoint(ml_client: MLClient, endpoint_name: str) -> str:
 
 def deploy_model_to_endpoint(ml_client: MLClient, endpoint_name: str, deployment_name: str):
     model_name = os.getenv('MODEL_NAME')
-    action_text = f'Deploy model "{model_name}" to endpoint'
+    action_text = f'Deploy model "{model_name}" to endpoint "{endpoint_name}"'
     start_action(action_text)
 
     latest_model_version = max(
@@ -68,9 +69,9 @@ def fetch_endpoint_api_key(endpoint_name: str) -> str:
     start_action(action_text)
 
     api_key = execute_cli_command(f'az ml online-endpoint get-credentials' +
-                                  f' -g {os.getenv("RESOURCE_GROUP")}' +
-                                  f' -w {os.getenv("AML_WORKSPACE_NAME")}' +
-                                  f' -n {endpoint_name}' +
+                                  f' --resource-group {os.getenv("RESOURCE_GROUP")}' +
+                                  f' --workspace-name {os.getenv("AML_WORKSPACE_NAME")}' +
+                                  f' --name {endpoint_name}' +
                                   f' --query "primaryKey"')
     end_action(action_text)
     return api_key
