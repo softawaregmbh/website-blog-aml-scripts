@@ -1,5 +1,4 @@
 import os
-import time
 import uuid
 
 import pandas as pd
@@ -11,7 +10,7 @@ from azureml.core.authentication import ServicePrincipalAuthentication
 import dotenv
 from sklearn import datasets
 
-from utils import execute_cli_command, start_action, end_action, wait
+from utils import execute_cli_command, start_action, end_action, wait, request_user_consent
 
 
 def main():
@@ -23,11 +22,12 @@ def main():
     environment_name = 'env-digit-classifier'
     app_registration_name = f'ar-aml-showcase-client-{unique_suffix}'
 
-    # TODO: Check if azure cli is installed
-    # TODO: Check if azure cli ml extension is enabled
-
     print()
+
+    added_extension = install_az_ml_extension()
+
     subscription_id = confirm_used_subscription()
+
     print()
 
     create_resource_group(resource_group_name)
@@ -65,7 +65,32 @@ def main():
 
     save_configuration_in_environment(subscription_id, resource_group_name, aml_workspace_name, storage_account_name,
                                       compute_cluster_name, environment_name, app_reg_id, app_reg_tenant_id,
-                                      app_reg_app_id, app_reg_password)
+                                      app_reg_app_id, app_reg_password, added_extension)
+
+
+def install_az_ml_extension() -> bool:
+    extension_name = 'ml'
+    action_text = 'Fetch installed Azure CLI extensions'
+    start_action(action_text)
+
+    plugin_list = execute_cli_command('az extension list' +
+                                      ' --query "[].name"')
+    end_action(action_text)
+    if extension_name in plugin_list:
+        return False
+
+    consenting = request_user_consent(f'\nAzure CLI extension "{extension_name}" is required and will be installed '
+                                      f'(The cleanup script would remove it later automatically).')
+    if not consenting:
+        quit()
+
+    print()
+    action_text = f'Install "{extension_name}" extension for Azure CLI'
+    start_action(action_text)
+    execute_cli_command(f'az extension add' +
+                        f' --name {extension_name}')
+    end_action(action_text)
+    return True
 
 
 def confirm_used_subscription() -> str:
@@ -77,10 +102,8 @@ def confirm_used_subscription() -> str:
     end_action(action_text)
 
     subscription_name = subscription['name']
-    print(f'\nSubscription "{subscription_name}" will be used to create multiple resources.')
-    response = input('Do you want to continue? [Y/n] ')
-
-    if len(response) > 0 and response.lower() != 'y':
+    consenting = request_user_consent(f'\nSubscription "{subscription_name}" will be used to create multiple resources.')
+    if not consenting:
         print('\nExecute "az account set --name <name>" to select a different subscription')
         print('For more information visit ' +
               'https://learn.microsoft.com/en-us/cli/azure/account?view=azure-cli-latest#az-account-set')
@@ -234,12 +257,14 @@ def create_environment(ml_client: MLClient, environment_name: str):
     end_action(action_text)
 
 
-def save_configuration_in_environment(subscription_id, resource_group_name, aml_workspace_name, storage_account_name,
-                                      compute_cluster_name, environment_name, app_reg_id, app_reg_tenant_id,
-                                      app_reg_app_id, app_reg_password):
+def save_configuration_in_environment(subscription_id: str, resource_group_name: str, aml_workspace_name: str,
+                                      storage_account_name: str, compute_cluster_name: str, environment_name: str,
+                                      app_reg_id: str, app_reg_tenant_id: str, app_reg_app_id: str,
+                                      app_reg_password: str, added_extension: bool):
     action_text = 'Save configuration in .env file'
     start_action(action_text)
 
+    dotenv.set_key('../.env', 'AZURE_CLI_ML_EXTENSION_ADDED', str(added_extension))
     dotenv.set_key('../.env', 'SUBSCRIPTION_ID', subscription_id)
     dotenv.set_key('../.env', 'RESOURCE_GROUP', resource_group_name)
     dotenv.set_key('../.env', 'AML_WORKSPACE_NAME', aml_workspace_name)

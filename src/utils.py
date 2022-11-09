@@ -47,3 +47,9 @@ def wait(seconds: int):
     start_action(action_text)
     time.sleep(seconds)
     end_action(action_text)
+
+
+def request_user_consent(question: str) -> bool:
+    print(question)
+    response = input('Do you want to continue? [Y/n] ')
+    return len(response) == 0 or response.lower() == 'y'
