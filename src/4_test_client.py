@@ -76,7 +76,7 @@ def pretty_print_results(pred_samples, y_samples):
     print('\n' +
           '┌───────┬────────────┐\n' +
           '│ Label │ Prediction │\n' +
-          '├┄┄┄┄┄┄┄┼┄┄┄┄┄┄┄┄┄┄┄┄┤')
+          '├───────┼────────────┤')
     if pred_samples is not None:
         for label, prediction in zip(y_samples, pred_samples):
             print(f'│ {label:<5} │ {prediction}          │')
