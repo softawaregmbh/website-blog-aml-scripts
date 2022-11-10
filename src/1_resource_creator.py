@@ -135,7 +135,7 @@ def create_azure_ml_workspace(resource_group_name: str, aml_workspace_name: str)
                                            f' --name "{aml_workspace_name}"' +
                                            f' --query "id"')
 
-    storage_account_id = aml_workspace['storageAccount']
+    storage_account_id = aml_workspace['storage_account']
     storage_account_name = execute_cli_command(f'az storage account show' +
                                                f' --id {storage_account_id}' +
                                                f' --query "name"')
