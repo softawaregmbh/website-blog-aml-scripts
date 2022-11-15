@@ -4,7 +4,7 @@ import dotenv
 
 from utils import execute_cli_command, start_action, end_action
 
-dotenv.load_dotenv('../.env')
+dotenv.load_dotenv('.env')
 
 
 def main():

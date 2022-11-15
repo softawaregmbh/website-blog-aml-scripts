@@ -8,7 +8,7 @@ import dotenv
 
 from utils import execute_cli_command, start_action, end_action
 
-dotenv.load_dotenv('../.env')
+dotenv.load_dotenv('.env')
 
 
 def main():
@@ -81,9 +81,10 @@ def update_environment_configuration(scoring_uri: str, deployment_name: str, api
     action_text = 'Update environment configuration'
     start_action(action_text)
 
-    dotenv.set_key('../.env', 'ENDPOINT_URL', scoring_uri)
-    dotenv.set_key('../.env', 'ENDPOINT_API_KEY', api_key)
-    dotenv.set_key('../.env', 'ENDPOINT_MODEL_DEPLOYMENT', deployment_name)
+    dotenv_file = os.path.join('./', '.env')
+    dotenv.set_key(dotenv_file, 'ENDPOINT_URL', scoring_uri)
+    dotenv.set_key(dotenv_file, 'ENDPOINT_API_KEY', api_key)
+    dotenv.set_key(dotenv_file, 'ENDPOINT_MODEL_DEPLOYMENT', deployment_name)
 
     end_action(action_text)
 

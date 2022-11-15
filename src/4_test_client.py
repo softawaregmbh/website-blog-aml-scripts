@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 from utils import start_action, end_action
 
-load_dotenv('../.env')
+load_dotenv('.env')
 
 
 def main():

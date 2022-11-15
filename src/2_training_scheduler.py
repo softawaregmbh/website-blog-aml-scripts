@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 from utils import start_action, end_action
 
-load_dotenv('../.env')
+load_dotenv('.env')
 
 
 def main():
@@ -23,7 +23,7 @@ def main():
 
     environment = f'{os.getenv("ENVIRONMENT_NAME")}@latest'
     compute_instance = os.getenv('COMPUTE_INSTANCE_NAME')
-    job = command(code='../', command='python ./src/2_training.py', environment=environment, compute=compute_instance,
+    job = command(code='./', command='python ./src/2_training.py', environment=environment, compute=compute_instance,
                   experiment_name='train_digit_classifier_model', display_name='Digit Classifier Model Training')
 
     ml_client.jobs.create_or_update(job)
