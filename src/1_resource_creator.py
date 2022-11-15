@@ -22,6 +22,9 @@ def main():
     environment_name = 'env-digit-classifier'
     app_registration_name = f'ar-aml-showcase-client-{unique_suffix}'
 
+    # todo: check if Azure CLI is installed
+    # todo: check if Azure CLI has logged in account
+
     print()
 
     added_extension = install_az_ml_extension()
@@ -248,7 +251,7 @@ def create_environment(ml_client: MLClient, environment_name: str):
     pipeline_job_env = Environment(
         name=environment_name, description='Custom environment for digit classification',
         tags={'scikit-learn': '1.1.2'},
-        conda_file=os.path.join('./', '1_conda_env.yml'),
+        conda_file=os.path.join('src', '1_conda_env.yml'),
         image='mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest'
     )
 
