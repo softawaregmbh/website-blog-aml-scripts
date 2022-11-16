@@ -87,10 +87,13 @@ def analyze_and_export_model(digit_classifier, x_test, y_test):
         sk_model=digit_classifier,
         registered_model_name=model_name,
         artifact_path=model_name,
+        conda_env=os.path.join('src', '1_conda_env.yml'),
     )
+
     mlflow.sklearn.save_model(
         sk_model=digit_classifier,
         path=os.path.join(model_name, "trained_model"),
+        conda_env=os.path.join('src', '1_conda_env.yml'),
     )
 
     end_action(action_text)
