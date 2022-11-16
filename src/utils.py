@@ -1,4 +1,6 @@
 import json
+from matplotlib import figure
+from PIL import Image as PILImage
 import subprocess
 import time
 from typing import Union
@@ -53,3 +55,7 @@ def request_user_consent(question: str) -> bool:
     print(question)
     response = input('Do you want to continue? [Y/n] ')
     return len(response) == 0 or response.lower() == 'y'
+
+
+def matplotlib_figure_to_pillow_image(figure: figure) -> PILImage:
+    return PILImage.frombytes('RGB', figure.canvas.get_width_height(), figure.canvas.tostring_rgb())

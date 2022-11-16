@@ -5,19 +5,17 @@ from azureml.core.authentication import ServicePrincipalAuthentication
 from dotenv import load_dotenv
 import mlflow
 import mlflow.sklearn
+from sklearn.metrics import (
+    accuracy_score, f1_score, precision_score, recall_score, classification_report,
+    confusion_matrix, ConfusionMatrixDisplay
+)
 from sklearn.model_selection import GridSearchCV
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 
-from utils import start_action, end_action
+from utils import start_action, end_action, matplotlib_figure_to_pillow_image
 
 load_dotenv('./.env')
-
-mlflow.sklearn.autolog()
-
-from sklearn.metrics import (
-    accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix
-)
 
 
 def main():
@@ -89,9 +87,16 @@ def analyze_model(digit_classifier, x_test, y_test):
     y_pred = digit_classifier.predict(x_test)
     print(classification_report(y_test, y_pred))
 
+    mlflow.log_metric('test_accuracy', accuracy_score(y_test, y_pred, normalize=True))
     mlflow.log_metric('test_f1_score', f1_score(y_test, y_pred, average="macro"))
-    # print(precision_score(y_test, y_pred, average="macro"))
-    # print(recall_score(y_test, y_pred, average="macro"))
+    mlflow.log_metric('test_precision', precision_score(y_test, y_pred, average="macro"))
+    mlflow.log_metric('test_recall', recall_score(y_test, y_pred, average="macro"))
+
+    confusion_matrix_display = ConfusionMatrixDisplay(
+        confusion_matrix=confusion_matrix(y_test, y_pred, labels=digit_classifier.classes_),
+        display_labels=digit_classifier.classes_
+    )
+    mlflow.log_image(matplotlib_figure_to_pillow_image(confusion_matrix_display.figure_), 'test_confusion_matrix.png')
 
     end_action(action_text)
 
