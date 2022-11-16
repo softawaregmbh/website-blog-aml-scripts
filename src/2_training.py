@@ -5,7 +5,6 @@ from azureml.core.authentication import ServicePrincipalAuthentication
 from dotenv import load_dotenv
 import mlflow
 import mlflow.sklearn
-from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
@@ -13,6 +12,12 @@ from sklearn.preprocessing import StandardScaler
 from utils import start_action, end_action
 
 load_dotenv('./.env')
+
+mlflow.sklearn.autolog()
+
+from sklearn.metrics import (
+    accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix
+)
 
 
 def main():
@@ -34,7 +39,9 @@ def main():
 
     digit_classifier = tune_hyperparameters(x_train, y_train)
 
-    analyze_and_export_model(digit_classifier, x_test, y_test)
+    analyze_model(digit_classifier, x_test, y_test)
+
+    export_model(digit_classifier)
 
     mlflow.end_run()
 
@@ -75,12 +82,23 @@ def tune_hyperparameters(x_train, y_train):
     return param_tuner.best_estimator_
 
 
-def analyze_and_export_model(digit_classifier, x_test, y_test):
-    action_text = 'Analyze and export model'
+def analyze_model(digit_classifier, x_test, y_test):
+    action_text = 'Analyze model'
     start_action(action_text)
 
     y_pred = digit_classifier.predict(x_test)
     print(classification_report(y_test, y_pred))
+
+    mlflow.log_metric('test_f1_score', f1_score(y_test, y_pred, average="macro"))
+    # print(precision_score(y_test, y_pred, average="macro"))
+    # print(recall_score(y_test, y_pred, average="macro"))
+
+    end_action(action_text)
+
+
+def export_model(digit_classifier):
+    action_text = 'Export model'
+    start_action(action_text)
 
     model_name = os.getenv('MODEL_NAME')
     mlflow.sklearn.log_model(
