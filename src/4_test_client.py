@@ -79,7 +79,8 @@ def pretty_print_results(pred_samples, y_samples):
           '├───────┼────────────┤')
     if pred_samples is not None:
         for label, prediction in zip(y_samples, pred_samples):
-            print(f'│ {label:<5} │ {prediction}          │')
+            success_label = '✅' if label == prediction else '❌'
+            print(f'│ {label:<5} │ {prediction}          │ {success_label}')
     print('└───────┴────────────┘')
 
 
