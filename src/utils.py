@@ -1,5 +1,5 @@
 import json
-from matplotlib import figure
+from matplotlib import figure as Figure
 from PIL import Image as PILImage
 import subprocess
 import time
@@ -57,5 +57,7 @@ def request_user_consent(question: str) -> bool:
     return len(response) == 0 or response.lower() == 'y'
 
 
-def matplotlib_figure_to_pillow_image(figure: figure) -> PILImage:
+def matplotlib_figure_to_pillow_image(figure: Figure, not_drawn_before: bool = True) -> PILImage:
+    if not_drawn_before:
+        figure.canvas.draw()
     return PILImage.frombytes('RGB', figure.canvas.get_width_height(), figure.canvas.tostring_rgb())

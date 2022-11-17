@@ -96,7 +96,12 @@ def analyze_model(digit_classifier, x_test, y_test):
         confusion_matrix=confusion_matrix(y_test, y_pred, labels=digit_classifier.classes_),
         display_labels=digit_classifier.classes_
     )
-    mlflow.log_image(matplotlib_figure_to_pillow_image(confusion_matrix_display.figure_), 'test_confusion_matrix.png')
+    confusion_matrix_display.plot()
+
+    mlflow.log_image(
+        matplotlib_figure_to_pillow_image(confusion_matrix_display.figure_),
+        'test_confusion_matrix.png'
+    )
 
     end_action(action_text)
 
