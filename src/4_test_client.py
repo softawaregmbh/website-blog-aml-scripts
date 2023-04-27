@@ -7,6 +7,7 @@ import urllib.request
 
 from azureml.core import Workspace, Dataset
 from dotenv import load_dotenv
+from sklearn.preprocessing import StandardScaler
 
 from utils import start_action, end_action
 
@@ -15,7 +16,7 @@ load_dotenv('.env')
 
 def main():
     print()
-    x_samples, y_samples = fetch_n_samples(n=10)
+    x_samples, y_samples = fetch_n_samples(n=20)
 
     pred_samples = predict_test_samples(x_samples)
 
@@ -32,15 +33,21 @@ def fetch_n_samples(n: int) -> [list, list]:
         os.getenv('AML_WORKSPACE_NAME')
     )
 
+    train = Dataset.get_by_name(workspace, name='MNIST Database - Train Partition').to_pandas_dataframe()
     test = Dataset.get_by_name(workspace, name='MNIST Database - Test Partition').to_pandas_dataframe()
 
     first_n_samples = test.loc[0:(n - 1)]
 
-    x_samples = first_n_samples.loc[:, first_n_samples.columns != 'label']
+    x_train = train.loc[:, train.columns != 'label']
+    scaler = StandardScaler().fit(x_train)
+
+    x_samples = scaler.transform(
+        first_n_samples.loc[:, first_n_samples.columns != 'label']
+    )
     y_samples = first_n_samples['label']
 
     end_action(action_text)
-    return x_samples.values.tolist(), y_samples.values.tolist()
+    return x_samples.tolist(), y_samples.values.tolist()
 
 
 def predict_test_samples(x_samples: list) -> typing.Optional[list]:

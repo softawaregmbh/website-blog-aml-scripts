@@ -46,13 +46,15 @@ def main():
 
     wait(seconds=60)
 
-    grant_permissions('User-assigned Managed Identity', managed_id_principal_id,
-                      'AML Storage Account', storage_account_id, 'Storage Blob Data Contributor')
-    grant_permissions('App Registration', app_reg_app_id,
-                      'AML Workspace', aml_workspace_id, 'Contributor')
+    grant_permissions(assignee_title='User-assigned Managed Identity', assignee=managed_id_principal_id,
+                      scope_title='AML Storage Account', scope=storage_account_id,
+                      role='Storage Blob Data Contributor')
+    grant_permissions(assignee_title='App Registration', assignee=app_reg_app_id,
+                      scope_title='AML Workspace', scope=aml_workspace_id,
+                      role='Contributor')
 
     ml_client = MLClient(
-        credential=DefaultAzureCredential(),
+        credential=DefaultAzureCredential(),  # The credentials of the user logged into the Azure CLI
         subscription_id=subscription_id,
         resource_group_name=resource_group_name,
         workspace_name=aml_workspace_name,
@@ -83,7 +85,7 @@ def install_az_ml_extension() -> bool:
         return False
 
     consenting = request_user_consent(f'\nAzure CLI extension "{extension_name}" is required and will be installed '
-                                      f'(The cleanup script would remove it later automatically).')
+                                      f'(The cleanup script auto removes it later).')
     if not consenting:
         quit()
 
@@ -94,7 +96,6 @@ def install_az_ml_extension() -> bool:
                         f' --name {extension_name}')
     end_action(action_text)
     return True
-
 
 def confirm_used_subscription() -> str:
     action_text = 'Fetch details of currently selected subscription'
@@ -122,12 +123,10 @@ def create_resource_group(resource_group_name: str):
     _ = execute_cli_command(f'az group create' +
                             f' --name {resource_group_name}' +
                             f' --location westeurope')
-    end_action(action_text)
 
 
 def create_azure_ml_workspace(resource_group_name: str, aml_workspace_name: str) -> (str, str):
     action_text = f'Create Azure Machine Learning Workspace "{aml_workspace_name}" and supportive resources'
-    start_action(action_text)
 
     aml_workspace = execute_cli_command(f'az ml workspace create ' +
                                         f' --resource-group {resource_group_name}' +
@@ -176,8 +175,8 @@ def create_app_registration(app_registration_name: str) -> (str, str, str, str):
 
     end_action(action_text)
 
-    return app_registration_id, app_registration_service_principal,\
-           app_registration_secrets['tenant'], app_registration_secrets['appId'], app_registration_secrets['password']
+    return app_registration_id, app_registration_service_principal, \
+        app_registration_secrets['tenant'], app_registration_secrets['appId'], app_registration_secrets['password']
 
 
 def grant_permissions(assignee_title: str, assignee: str, scope_title: str, scope: str, role: str):
