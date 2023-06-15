@@ -1,9 +1,3 @@
-# ML in der Cloud? Skripte
+# Machine Learning in der Cloud? Skripte
 
-*tbd later*
-
-
-## Setup
-
-venv einrichten
-requirements.txt installieren
+Hier befinden sich die unterstützenden Skripte zum [dritten Beitrag](https://softaware.at/codeaware/2023/06/28/aml-3) der Blog-Serie __Machine Learning in der Cloud__.
